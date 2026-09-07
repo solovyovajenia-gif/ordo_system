@@ -149,6 +149,7 @@ main, .nav, .wa-float { position: relative; z-index: 1; }
 @keyframes float-gentle { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .hub-float { animation: float-gentle 6s ease-in-out infinite; will-change: transform; }
 @keyframes hub-ring-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.scroll-cue { display: none; }
 
 /* === LOGO CAROUSEL === */
 .logo-strip { padding: 44px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; position: relative; background: rgba(14,24,36,0.4); backdrop-filter: blur(6px); }
@@ -298,13 +299,18 @@ a.cm-value:hover { color: var(--accent-light); }
 /* === RESPONSIVE === */
 @media (max-width: 900px) {
   :root { --stack-top: 80px; }
-  .hero { padding: 120px 0 64px; min-height: auto; }
-  .hero-grid { grid-template-columns: 1fr; gap: 36px; }
-  .hub-wrap { order: -1; margin: 0 0 8px; }
-  .hub-svg { max-width: 100%; }
+  .hero { padding: 60px 0 64px; min-height: auto; overflow: visible; }
+  .hero-grid { grid-template-columns: 1fr; gap: 0; }
+  .hub-wrap { order: -1; margin: 0; position: sticky; top: 60px; z-index: 0; height: calc(100vh - 60px); height: calc(100dvh - 60px); }
+  .hub-svg { width: 104vw; max-width: none; will-change: transform; }
+  .hub-float { will-change: opacity; }
   .hub-layer.l1 { width: 100vw; height: 100vw; margin: -50vw 0 0 -50vw; }
   .hub-layer.l2 { width: 120vw; height: 120vw; margin: -60vw 0 0 -60vw; }
   .hub-layer.l3 { width: 90vw; height: 90vw; margin: -45vw 0 0 -45vw; }
+  .scroll-cue { display: flex; position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); flex-direction: column; align-items: center; gap: 4px; color: var(--fg-dim); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; z-index: 2; }
+  .scroll-cue svg { width: 24px; height: 24px; fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; animation: cue-bounce 1.8s ease-in-out infinite; }
+  @keyframes cue-bounce { 0%, 100% { transform: translateY(0); opacity: 0.9; } 50% { transform: translateY(7px); opacity: 0.4; } }
+  .hero-text { position: relative; z-index: 2; margin: -14vh -24px 0; padding: 56px 24px 0; background: linear-gradient(180deg, rgba(14,24,36,0) 0%, rgba(14,24,36,0.88) 22%, var(--bg) 45%); }
   .hero-stats { margin-top: 14px; }
   .scard { grid-template-columns: 1fr; gap: 20px; padding: 28px 24px; min-height: 0; }
   .scard-visual { min-height: 150px; order: -1; }
@@ -388,7 +394,7 @@ a.cm-value:hover { color: var(--accent-light); }
 <section class="hero" id="hero">
   <div class="container">
     <div class="hero-grid">
-      <div>
+      <div class="hero-text" id="heroText">
         <div class="hero-eyebrow reveal in">WS Services · Dubai</div>
         <h1 class="reveal in">Got your license but don't know <span class="highlight">where to start?</span></h1>
         <p class="hero-sub reveal in" data-delay="1">We set up the infrastructure your business actually runs on — CRM, telephony, messengers, website, automation — wired together so everything works from day one.</p>
@@ -453,6 +459,10 @@ a.cm-value:hover { color: var(--accent-light); }
           <text x="260" y="270" fill="#1A3350" font-family="Montserrat, sans-serif" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="0.06em">COMPANY</text>
         </svg>
         </div>
+        <a href="#heroText" class="scroll-cue" id="scrollCue" aria-label="Scroll down">
+          <span>Scroll</span>
+          <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+        </a>
       </div>
     </div>
   </div>
@@ -710,6 +720,12 @@ var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyWGlrq9_hw8BSKFFZy
 
   // Scroll-driven: progress bar, parallax layers, card stack, timeline
   var progress = document.getElementById('navProgress');
+  var mobileMq = window.matchMedia('(max-width: 900px)');
+  var hubFloat = document.querySelector('.hub-float');
+  var hubSvg = document.querySelector('.hub-svg');
+  var hubLayers = Array.prototype.slice.call(document.querySelectorAll('.hub-layer'));
+  var scrollCue = document.getElementById('scrollCue');
+  var heroFxApplied = false;
   var grid = document.getElementById('bgGrid');
   var glow1 = document.getElementById('glow1');
   var glow2 = document.getElementById('glow2');
@@ -726,6 +742,22 @@ var FORM_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyWGlrq9_hw8BSKFFZy
     var vh = window.innerHeight;
     var docH = document.documentElement.scrollHeight - vh;
     progress.style.transform = 'scaleX(' + (docH > 0 ? y / docH : 0) + ')';
+
+    // Mobile hero: text panel slides over the hub, hub fades back and shrinks
+    if (mobileMq.matches) {
+      var hp = Math.max(0, Math.min(1, y / (vh * 0.6)));
+      hubFloat.style.opacity = 1 - hp * 0.7;
+      hubSvg.style.transform = 'scale(' + (1 - hp * 0.12) + ')';
+      hubLayers.forEach(function (l) { l.style.opacity = 1 - hp * 0.8; });
+      scrollCue.style.opacity = Math.max(0, 1 - hp * 3);
+      heroFxApplied = true;
+    } else if (heroFxApplied) {
+      hubFloat.style.opacity = '';
+      hubSvg.style.transform = '';
+      hubLayers.forEach(function (l) { l.style.opacity = ''; });
+      scrollCue.style.opacity = '';
+      heroFxApplied = false;
+    }
 
     if (!reduced) {
       grid.style.transform = 'translateY(' + (-y * 0.06) + 'px)';
