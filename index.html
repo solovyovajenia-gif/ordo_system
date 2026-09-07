@@ -130,6 +130,7 @@ main, .nav, .wa-float { position: relative; z-index: 1; }
 .stat { display: flex; align-items: baseline; gap: 10px; }
 .stat b { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: var(--fg); line-height: 1; }
 .stat span { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg-dim); }
+.hero-more { display: none; }
 
 /* hero depth layers */
 .hub-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
@@ -303,13 +304,15 @@ a.cm-value:hover { color: var(--accent-light); }
   .hero-text { display: contents; }
   .hero-eyebrow { order: 1; margin-bottom: 14px; }
   .hero h1 { order: 2; margin-bottom: 10px; }
-  .hub-wrap { order: 3; margin: 0 -24px; overflow: hidden; padding: 22px 0 20px; }
+  .hub-wrap { order: 3; margin: 0 -24px; overflow: hidden; padding: 8px 0 6px; }
   .hub-svg { width: 100vw; max-width: 440px; }
   .hub-layer.l1 { width: 112vw; height: 112vw; margin: -56vw 0 0 -56vw; }
   .hub-layer.l2 { width: 134vw; height: 134vw; margin: -67vw 0 0 -67vw; }
   .hub-layer.l3 { width: 98vw; height: 98vw; margin: -49vw 0 0 -49vw; }
   .hero-cta-row { order: 4; margin-top: 14px; }
-  .hero-stats { order: 5; }
+  .btn-ghost { display: none; }
+  .hero-stats { order: 5; display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding: 0 4px; }
+  .hero-more { display: inline; font-size: 0.75rem; font-weight: 600; color: var(--accent); letter-spacing: 0.02em; }
   .hero-sub { order: 6; max-width: none; margin: 30px 0 0; padding-top: 24px; border-top: 1px solid var(--border); }
   .hero-stats { margin-top: 14px; }
   .scard { grid-template-columns: 1fr; gap: 20px; padding: 28px 24px; min-height: 0; }
@@ -406,6 +409,7 @@ a.cm-value:hover { color: var(--accent-light); }
         </div>
         <div class="hero-stats reveal in" data-delay="3">
           <div class="stat"><b>15 min</b><span>Reply time</span></div>
+          <a href="#services" class="hero-more">See services ↓</a>
         </div>
       </div>
       <div class="hub-wrap" id="hubWrap">
